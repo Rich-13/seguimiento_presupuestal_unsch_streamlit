@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import streamlit as st
 import grafico_lineas as grafln
 import grafico_pizza as grafpz
@@ -11,15 +12,48 @@ st.header('1. Cuadro de Necesidades')
 
 df_seguimiento = pd.read_excel('https://raw.githubusercontent.com/Rich-13/seguimiento_presupuestal_unsch/main/cn_mes_2025.xlsx')
 
+#Crear unidades por mes
+for mes in range(1, 13):
+    mnto_col = f'MNTO_{mes:02}'
+    cant_col = f'CANT_{mes:02}'
+    uni_col = f'UNI_{mes:02}'
+    
+    # Añadir condición para cuando tanto el numerador como el denominador sean cero
+    df_seguimiento[uni_col] = np.where(
+        (df_seguimiento[mnto_col] == 0) & (df_seguimiento[cant_col] == 0), 
+        0,  # Resultado cuando ambos son 0
+        np.where(
+            df_seguimiento['TIPO_BIEN'] == 'S', 
+            df_seguimiento[mnto_col] / df_seguimiento[cant_col], 
+            df_seguimiento[cant_col]
+        )
+    )
+
 
 #Configurando Filtros
+st.sidebar.image('assets/logoUNSCH.png')
 st.sidebar.title('Filtros')
 lista_cc = sorted(list(df_seguimiento['NOMBRE_DEPEND'].unique()))
+lista_tb = sorted(list(df_seguimiento['TIPO_BIEN'].unique()))
+lista_ff = sorted(list(df_seguimiento['NOMBRE_FF'].unique()))
+
+#Diccionario para B y S
+diccionario_tb = {'S': 'Servicio', 'B': 'Bien'}
+
+#selectbox
 nombres_cc = st.sidebar.selectbox('Centro de Costo',lista_cc,index=None,placeholder="Ingrese el Centro de Costo")
+nombres_tb = st.sidebar.selectbox('Tipo de Bien',lista_tb,format_func=lambda x: diccionario_tb.get(x, x),index=None,placeholder="Ingrese el Bien")
+nombres_ff = st.sidebar.selectbox('Fuente de Financiamiento',lista_ff,index=None,placeholder="Ingrese la Fuente de Financiamiento")
 
 #Filtrando los datos
 if nombres_cc:
     df_seguimiento = df_seguimiento[df_seguimiento['NOMBRE_DEPEND']==nombres_cc]
+
+if nombres_tb:
+    df_seguimiento = df_seguimiento[df_seguimiento['TIPO_BIEN']==nombres_tb]
+
+if nombres_ff:
+    df_seguimiento = df_seguimiento[df_seguimiento['NOMBRE_FF']==nombres_ff]
 
 #Ejecución por tipo
 df_asignacion_bien = df_seguimiento[df_seguimiento['TIPO_BIEN'] =='B']
@@ -42,7 +76,7 @@ with col2:
     
     st.plotly_chart(graf_lineas, use_container_width=True)
 
-df_datos_grupos = df_seguimiento.groupby(['nombre_tarea','NOMBRE_CLASI','NOMBRE_ITEM']).agg({'MNTO_01':'sum','CANT_01':'sum','MNTO_02':'sum','MNTO_03':'sum','MNTO_04':'sum','MNTO_05':'sum','MNTO_06':'sum','MNTO_07':'sum','MNTO_08':'sum','MNTO_09':'sum','MNTO_10':'sum','MNTO_11':'sum','MNTO_12':'sum','MNTO_TOTAL':'sum'}).reset_index()
+df_datos_grupos = df_seguimiento.groupby(['nombre_tarea','NOMBRE_CLASI','NOMBRE_ITEM']).agg({'MNTO_01':'sum','UNI_01':'sum','MNTO_02':'sum','UNI_02':'sum','MNTO_03':'sum','UNI_03':'sum','MNTO_04':'sum','UNI_04':'sum','MNTO_05':'sum','UNI_05':'sum','MNTO_06':'sum','UNI_06':'sum','MNTO_07':'sum','UNI_07':'sum','MNTO_08':'sum','UNI_08':'sum','MNTO_09':'sum','UNI_09':'sum','MNTO_10':'sum','UNI_10':'sum','MNTO_11':'sum','UNI_11':'sum','MNTO_12':'sum','UNI_12':'sum','MNTO_TOTAL':'sum'}).reset_index()
 df_datos_grupos = df_datos_grupos.sort_values('MNTO_TOTAL',ascending=False)
 gob2 = GridOptionsBuilder.from_dataframe(df_datos_grupos)
 
@@ -93,13 +127,14 @@ gob2.configure_column(
     width=100,  # Ancho ajustado
     valueFormatter="value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })",
 )
+
 gob2.configure_column(
-    field="CANT_01",
-    header_name="Ca",
+    field="UNI_01",
+    header_name="Un",
     minWidth=60,
     width=60,  # Ancho ajustado
     filter=False,
-    cellStyle={"backgroundColor": "#ffeb3b", "color": "black"},
+    #cellStyle={"backgroundColor": "#ffeb3b", "color": "black"},
     #valueFormatter="value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })",
 )
 
@@ -110,6 +145,15 @@ gob2.configure_column(
     width=100,  # Ancho ajustado
     valueFormatter="value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })",
 )
+gob2.configure_column(
+    field="UNI_02",
+    header_name="Un",
+    minWidth=60,
+    width=60,  # Ancho ajustado
+    filter=False,
+    #cellStyle={"backgroundColor": "#ffeb3b", "color": "black"},
+    #valueFormatter="value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })",
+)
 
 gob2.configure_column(
     field="MNTO_03",
@@ -117,6 +161,15 @@ gob2.configure_column(
     minWidth=100,
     width=100,  # Ancho ajustado
     valueFormatter="value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })",
+)
+gob2.configure_column(
+    field="UNI_03",
+    header_name="Un",
+    minWidth=60,
+    width=60,  # Ancho ajustado
+    filter=False,
+    #cellStyle={"backgroundColor": "#ffeb3b", "color": "black"},
+    #valueFormatter="value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })",
 )
 
 gob2.configure_column(
@@ -126,6 +179,15 @@ gob2.configure_column(
     width=100,  # Ancho ajustado
     valueFormatter="value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })",
 )
+gob2.configure_column(
+    field="UNI_04",
+    header_name="Un",
+    minWidth=60,
+    width=60,  # Ancho ajustado
+    filter=False,
+    #cellStyle={"backgroundColor": "#ffeb3b", "color": "black"},
+    #valueFormatter="value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })",
+)
 
 gob2.configure_column(
     field="MNTO_05",
@@ -133,6 +195,15 @@ gob2.configure_column(
     minWidth=100,
     width=100,  # Ancho ajustado
     valueFormatter="value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })",
+)
+gob2.configure_column(
+    field="UNI_05",
+    header_name="Un",
+    minWidth=60,
+    width=60,  # Ancho ajustado
+    filter=False,
+    #cellStyle={"backgroundColor": "#ffeb3b", "color": "black"},
+    #valueFormatter="value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })",
 )
 
 gob2.configure_column(
@@ -142,6 +213,15 @@ gob2.configure_column(
     width=100,  # Ancho ajustado
     valueFormatter="value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })",
 )
+gob2.configure_column(
+    field="UNI_06",
+    header_name="Un",
+    minWidth=60,
+    width=60,  # Ancho ajustado
+    filter=False,
+    #cellStyle={"backgroundColor": "#ffeb3b", "color": "black"},
+    #valueFormatter="value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })",
+)
 
 gob2.configure_column(
     field="MNTO_07",
@@ -149,6 +229,15 @@ gob2.configure_column(
     minWidth=100,
     width=100,  # Ancho ajustado
     valueFormatter="value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })",
+)
+gob2.configure_column(
+    field="UNI_07",
+    header_name="Un",
+    minWidth=60,
+    width=60,  # Ancho ajustado
+    filter=False,
+    #cellStyle={"backgroundColor": "#ffeb3b", "color": "black"},
+    #valueFormatter="value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })",
 )
 
 gob2.configure_column(
@@ -158,6 +247,15 @@ gob2.configure_column(
     width=100,  # Ancho ajustado
     valueFormatter="value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })",
 )
+gob2.configure_column(
+    field="UNI_08",
+    header_name="Un",
+    minWidth=60,
+    width=60,  # Ancho ajustado
+    filter=False,
+    #cellStyle={"backgroundColor": "#ffeb3b", "color": "black"},
+    #valueFormatter="value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })",
+)
 
 gob2.configure_column(
     field="MNTO_09",
@@ -165,6 +263,15 @@ gob2.configure_column(
     minWidth=100,
     width=100,  # Ancho ajustado
     valueFormatter="value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })",
+)
+gob2.configure_column(
+    field="UNI_09",
+    header_name="Un",
+    minWidth=60,
+    width=60,  # Ancho ajustado
+    filter=False,
+    #cellStyle={"backgroundColor": "#ffeb3b", "color": "black"},
+    #valueFormatter="value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })",
 )
 
 gob2.configure_column(
@@ -174,6 +281,15 @@ gob2.configure_column(
     width=100,  # Ancho ajustado
     valueFormatter="value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })",
 )
+gob2.configure_column(
+    field="UNI_10",
+    header_name="Un",
+    minWidth=60,
+    width=60,  # Ancho ajustado
+    filter=False,
+    #cellStyle={"backgroundColor": "#ffeb3b", "color": "black"},
+    #valueFormatter="value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })",
+)
 
 gob2.configure_column(
     field="MNTO_11",
@@ -182,6 +298,15 @@ gob2.configure_column(
     width=100,  # Ancho ajustado
     valueFormatter="value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })",
 )
+gob2.configure_column(
+    field="UNI_11",
+    header_name="Un",
+    minWidth=60,
+    width=60,  # Ancho ajustado
+    filter=False,
+    #cellStyle={"backgroundColor": "#ffeb3b", "color": "black"},
+    #valueFormatter="value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })",
+)
 
 gob2.configure_column(
     field="MNTO_12",
@@ -189,6 +314,15 @@ gob2.configure_column(
     minWidth=100,
     width=100,  # Ancho ajustado
     valueFormatter="value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })",
+)
+gob2.configure_column(
+    field="UNI_12",
+    header_name="Un",
+    minWidth=60,
+    width=60,  # Ancho ajustado
+    filter=False,
+    #cellStyle={"backgroundColor": "#ffeb3b", "color": "black"},
+    #valueFormatter="value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })",
 )
 
 gob2.configure_column(
@@ -234,5 +368,5 @@ AgGrid(
 
 st.header('2. Ejecución Presupuestal')
 
-
-st.dataframe(df_seguimiento)
+st.image('assets/trabajando.gif')
+#st.dataframe(df_seguimiento)
