@@ -10,7 +10,7 @@ st.set_page_config(layout='wide')
 st.title('Seguimiento Presupuestal 2025 :bar_chart: ')
 st.header('1. Cuadro de Necesidades')
 
-df_seguimiento = pd.read_excel('https://raw.githubusercontent.com/Rich-13/seguimiento_presupuestal_unsch/main/cn_mes_2025.xlsx')
+df_seguimiento = pd.read_excel('https://raw.githubusercontent.com/Rich-13/seguimiento_presupuestal_unsch_streamlit/main/data/cn_mes_2025.xlsx')
 
 #Crear unidades por mes
 for mes in range(1, 13):
