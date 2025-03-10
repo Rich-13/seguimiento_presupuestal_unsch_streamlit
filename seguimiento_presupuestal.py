@@ -7,7 +7,7 @@ from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
 st.set_page_config(layout='wide')
 st.title('Seguimiento Presupuestal 2025 :bar_chart: ')
 df_seguimiento = pd.read_excel('https://raw.githubusercontent.com/Rich-13/seguimiento_presupuestal_unsch_streamlit/main/data/cn_mes_2025.xlsx')
-#df_ejecucion = pd.read_excel('')
+df_ejecucion = pd.read_excel('https://raw.githubusercontent.com/Rich-13/seguimiento_presupuestal_unsch_streamlit/main/data/ep_mes_2025.xlsx')
 tab_titles = [
     "CUADRO DE NECESIDADES 2025",
     "EJECUCIÓN PRESUPUESTAL 2025",
@@ -39,12 +39,12 @@ with tabs[0]:
     #Configurando Filtros
     st.sidebar.image('assets/logoUNSCH.png')
     st.sidebar.title('Filtros')
-    lista_cc = sorted(list(df_seguimiento['NOMBRE_DEPEND'].unique()))
-    lista_tb = sorted(list(df_seguimiento['TIPO_BIEN'].unique()))
-    lista_ff = sorted(list(df_seguimiento['NOMBRE_FF'].unique()))
+    lista_cc = sorted(list(df_ejecucion['NOMBRE_DEPEND'].unique()))
+    lista_tb = sorted(list(df_ejecucion['TIPO_BIEN'].unique()))
+    lista_ff = sorted(list(df_ejecucion['nombre_ff'].unique()))
 
     #Diccionario para B y S
-    diccionario_tb = {'S': 'Servicio', 'B': 'Bien'}
+    diccionario_tb = {'S': 'Servicio', 'B': 'Bien', 'V': 'Pasajes y Viáticos'}
 
     #selectbox
     nombres_cc = st.sidebar.selectbox('Centro de Costo',lista_cc,index=None,placeholder="Ingrese el Centro de Costo")
@@ -64,6 +64,7 @@ with tabs[0]:
     #Ejecución por tipo
     df_asignacion_bien = df_seguimiento[df_seguimiento['TIPO_BIEN'] =='B']
     df_asignacion_servicio = df_seguimiento[df_seguimiento['TIPO_BIEN'] =='S']
+    
 
     #Llamar Gráfico
     graf_lineas = grafln.crear_grafico_cn(df_seguimiento)
@@ -375,5 +376,40 @@ with tabs[0]:
 with tabs[1]:
     st.header('2. Ejecución Presupuestal')
 
-    st.image('assets/trabajando.gif')
-    #st.dataframe(df_seguimiento)
+    #Filtrando los datos
+    if nombres_cc:
+        df_ejecucion = df_ejecucion[df_ejecucion['NOMBRE_DEPEND']==nombres_cc]
+
+    if nombres_tb:
+        df_ejecucion = df_ejecucion[df_ejecucion['TIPO_BIEN']==nombres_tb]
+
+    #if nombres_ff:
+        #df_ejecucion = df_ejecucion[df_ejecucion['NOMBRE_FF']==nombres_ff]
+
+    #Ejecución por tipo
+    df_ejecucion_bien = df_ejecucion[df_ejecucion['TIPO_BIEN'] =='B']
+    df_ejecucion_servicio = df_ejecucion[df_ejecucion['TIPO_BIEN'] =='S']
+    df_ejecucion_viaticos = df_ejecucion[df_ejecucion['TIPO_BIEN'] =='V']
+
+    #Llamar Gráfico
+    graf_lineas_ep = grafln.crear_grafico_ep(df_ejecucion)
+    graf_pizza_ep = grafpz.crear_grafico_ep(df_ejecucion)
+    #Columnas
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric('**Presupuesto Ejecutado:**', f"S/ {(df_ejecucion['monto_nacional'].sum()):,.2f}")
+        st.metric('**Pasajes y Viáicos:**', f"S/ {(df_ejecucion_viaticos['monto_nacional'].sum()):,.2f}")
+        st.plotly_chart(graf_pizza_ep, use_container_width=True)
+        
+
+    with col2:
+        
+        st.metric('**Bien:**', f"S/ {(df_ejecucion_bien['monto_nacional'].sum()):,.2f}")
+        st.metric('**Servicio:**', f"S/ {(df_ejecucion_servicio['monto_nacional'].sum()):,.2f}")
+        
+        st.plotly_chart(graf_lineas_ep, use_container_width=True)
+
+    #st.image('assets/trabajando.gif')
+    st.dataframe(df_ejecucion)
+    #df_ejecucion = df_ejecucion[df_ejecucion['NOMBRE_DEPEND']==nombres_cc]
+    st.dataframe(df_ejecucion)

@@ -27,3 +27,23 @@ def crear_grafico_cn(df):
     fig.update_layout(xaxis_title="Meses", yaxis_title="Monto (S/)")
 
     return fig
+
+def crear_grafico_ep(df):
+    ejecucion_mensual = df.set_index('FECHA_DEVENGADO').groupby(pd.Grouper(freq = 'ME'))['monto_nacional'].sum().reset_index()
+    ejecucion_mensual['Year'] = ejecucion_mensual['FECHA_DEVENGADO'].dt.year
+    ejecucion_mensual['Month'] = ejecucion_mensual['FECHA_DEVENGADO'].dt.month_name()
+    ejecucion_mensual = ejecucion_mensual[ejecucion_mensual['Year'] > 2024]
+  
+
+    fig = px.line(ejecucion_mensual,
+        x = 'Month',
+        y = 'monto_nacional',
+        markers= True,
+        range_y = (0,ejecucion_mensual.max()),
+        color = 'Year',
+        line_dash = 'Year',
+        title = 'Ejecución Mensual'
+        )
+    fig.update_layout(yaxis_title = 'Ingresos (S/ )')
+
+    return fig
