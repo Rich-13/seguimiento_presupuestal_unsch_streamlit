@@ -64,6 +64,27 @@ with tabs[0]:
         st.metric('**Servicio:**', f"S/ {(df_ejecucion_servicio['monto_nacional'].sum()):,.2f}")
         st.plotly_chart(graf_lineas_ep, use_container_width=True)
 
+    month_order_es = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", 
+                  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+    month_translation = {
+        "January": "Enero", "February": "Febrero", "March": "Marzo", "April": "Abril",
+        "May": "Mayo", "June": "Junio", "July": "Julio", "August": "Agosto",
+        "September": "Septiembre", "October": "Octubre", "November": "Noviembre", "December": "Diciembre"
+}
+
+    df_ejecucion['mes'] = df_ejecucion['FECHA_DEVENGADO'].dt.month_name()
+    df_ejecucion = df_ejecucion[['nombre_tarea','clasificador','NOMBRE_ITEM','mes','monto_nacional']]
+    df_pivot_ep = df_ejecucion.pivot_table(index=['nombre_tarea','clasificador','NOMBRE_ITEM'],columns='mes',values='monto_nacional',aggfunc='sum').reset_index()
+    df_pivot_ep.columns.name = None
+    df_pivot_ep = df_pivot_ep.fillna(0)
+
+    df_pivot_ep.rename(columns=month_translation, inplace=True)
+    df_pivot_ep = df_pivot_ep[['nombre_tarea','clasificador','NOMBRE_ITEM'] + [month for month in month_order_es if month in df_pivot_ep.columns]]
+    #totales_ep = df_pivot_ep.iloc[:, 1:].sum()
+    #fila_totales_ep = pd.DataFrame([["TOTAL"] + totales_ep.tolist()], columns=df_pivot_ep.columns)
+    #df_pivot_ep = pd.concat([fila_totales_ep, df_pivot_ep], ignore_index=True)
+ 
+    st.dataframe(df_pivot_ep)
     #st.image('assets/trabajando.gif')
     st.dataframe(df_ejecucion)
     #df_ejecucion = df_ejecucion[df_ejecucion['NOMBRE_DEPEND']==nombres_cc]
