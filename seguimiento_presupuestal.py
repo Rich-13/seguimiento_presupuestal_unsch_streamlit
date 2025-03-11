@@ -73,17 +73,101 @@ with tabs[0]:
 }
 
     df_ejecucion['mes'] = df_ejecucion['FECHA_DEVENGADO'].dt.month_name()
-    df_ejecucion = df_ejecucion[['nombre_tarea','clasificador','NOMBRE_ITEM','mes','monto_nacional']]
-    df_pivot_ep = df_ejecucion.pivot_table(index=['nombre_tarea','clasificador','NOMBRE_ITEM'],columns='mes',values='monto_nacional',aggfunc='sum').reset_index()
+    df_ejecucion = df_ejecucion[['nombre_tarea','nombre_ff','NOMBRE_CLASIF','NOMBRE_ITEM','mes','monto_nacional']]
+    df_pivot_ep = df_ejecucion.pivot_table(index=['nombre_tarea','nombre_ff','NOMBRE_CLASIF','NOMBRE_ITEM'],columns='mes',values='monto_nacional',aggfunc='sum').reset_index()
     df_pivot_ep.columns.name = None
     df_pivot_ep = df_pivot_ep.fillna(0)
 
     df_pivot_ep.rename(columns=month_translation, inplace=True)
-    df_pivot_ep = df_pivot_ep[['nombre_tarea','clasificador','NOMBRE_ITEM'] + [month for month in month_order_es if month in df_pivot_ep.columns]]
+    df_pivot_ep = df_pivot_ep[['nombre_tarea','nombre_ff','NOMBRE_CLASIF','NOMBRE_ITEM'] + [month for month in month_order_es if month in df_pivot_ep.columns]]
     #totales_ep = df_pivot_ep.iloc[:, 1:].sum()
     #fila_totales_ep = pd.DataFrame([["TOTAL"] + totales_ep.tolist()], columns=df_pivot_ep.columns)
     #df_pivot_ep = pd.concat([fila_totales_ep, df_pivot_ep], ignore_index=True)
- 
+
+    df_datos_grupos_ep = df_pivot_ep.groupby(['nombre_tarea','nombre_ff','NOMBRE_CLASIF','NOMBRE_ITEM']).agg({'Enero':'sum','Febrero':'sum'}).reset_index()
+    #df_datos_grupos_ep = df_datos_grupos_ep.sort_values('MNTO_TOTAL',ascending=False)
+    gob3 = GridOptionsBuilder.from_dataframe(df_datos_grupos_ep)
+
+    gob3.configure_default_column(group= True,
+                                value=True,
+                                enableRowGroup=True,
+                                aggFunc='sum',
+                                wrapText=True,
+                                autoHeight=True,
+
+                                valueFormatter="parseFloat(value.toLocaleString()).toFixed(2)'",                      
+    )
+
+    gob3.configure_column(
+        field="nombre_tarea",
+        hide=True,
+        header_name="Nombre Tarea",
+        width=150,
+        #pinned='left',
+        rowGroup=True,
+        
+    )
+    gob3.configure_column(
+        field="nombre_ff",
+        hide=True,
+        header_name="Nombre Tarea",
+        width=150,
+        #pinned='left',
+        rowGroup=True,
+        
+    )
+
+    gob3.configure_column(
+        field="NOMBRE_CLASIF",
+        hide=True,
+        header_name="Clasificador",
+        width=150,
+        #pinned='left',
+        rowGroup=True,
+        
+    )
+    gob3.configure_column(
+        field="NOMBRE_ITEM",
+        hide=True,
+        header_name="Item",
+        width=150,
+        #pinned='left',
+        rowGroup=True,
+        
+    )
+
+    gob3.configure_column(
+        field="Enero",
+        header_name="Enero",
+        minWidth=100,
+        width=100,  # Ancho ajustado
+        valueFormatter="value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })",
+    )
+    
+    gob3.configure_grid_options(
+        suppressAggFuncInHeader = True,
+        #pinnedBottomRowData=[totales_row],
+        autoGroupColumnDef = {
+            "headerName": "Actividad Operativa",
+            "minWidth": 500,  # Ancho mínimo de la columna "Group"
+            "width": 500,     # Ajusta el ancho a tu gusto
+            "pinned": "left",
+            "cellRendererParams":{"suppressCount": True},
+
+            },
+    )
+
+    gridOptions = gob3.build()
+    st.markdown("**TABLA 01: CUADRO DE NECESIDADES MENSUALIZADO 2025**")
+    AgGrid(
+        df_datos_grupos_ep,
+        gridOptions=gridOptions,
+        height=500,
+        width='100%',
+        theme='streamlit',
+        fit_columns_on_grid_load=True,
+    )
+
     st.dataframe(df_pivot_ep)
     #st.image('assets/trabajando.gif')
     st.dataframe(df_ejecucion)
