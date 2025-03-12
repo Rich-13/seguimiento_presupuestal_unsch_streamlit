@@ -5,7 +5,7 @@ import grafico_lineas as grafln
 import grafico_pizza as grafpz
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
 st.set_page_config(layout='wide')
-st.title('Seguimiento Presupuestal 2026 :bar_chart: ')
+st.title('Seguimiento Presupuestal 2025 :bar_chart: ')
 df_seguimiento = pd.read_excel('https://raw.githubusercontent.com/Rich-13/seguimiento_presupuestal_unsch_streamlit/main/data/cn_mes_2025.xlsx')
 df_ejecucion = pd.read_excel('https://raw.githubusercontent.com/Rich-13/seguimiento_presupuestal_unsch_streamlit/main/data/ep_mes_2025.xlsx')
 tab_titles = [
