@@ -5,7 +5,7 @@ import grafico_lineas as grafln
 import grafico_pizza as grafpz
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
 st.set_page_config(layout='wide')
-st.title('Seguimiento Presupuestal 2025 :bar_chart: ')
+st.title('Seguimiento Presupuestal 2026 :bar_chart: ')
 df_seguimiento = pd.read_excel('https://raw.githubusercontent.com/Rich-13/seguimiento_presupuestal_unsch_streamlit/main/data/cn_mes_2025.xlsx')
 df_ejecucion = pd.read_excel('https://raw.githubusercontent.com/Rich-13/seguimiento_presupuestal_unsch_streamlit/main/data/ep_mes_2025.xlsx')
 tab_titles = [
@@ -97,6 +97,7 @@ with tabs[0]:
     #totales_ep = df_pivot_ep.iloc[:, 1:].sum()
     #fila_totales_ep = pd.DataFrame([["TOTAL"] + totales_ep.tolist()], columns=df_pivot_ep.columns)
     #df_pivot_ep = pd.concat([fila_totales_ep, df_pivot_ep], ignore_index=True)
+    df_datos_grupos_ep = []
     if agg_dict:
         df_datos_grupos_ep = df_pivot_ep.groupby(['nombre_tarea','nombre_ff','NOMBRE_CLASIF','NOMBRE_ITEM']).agg(agg_dict).reset_index()
 
