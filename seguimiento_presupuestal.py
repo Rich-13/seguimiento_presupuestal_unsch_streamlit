@@ -3,6 +3,7 @@ import numpy as np
 import streamlit as st
 import grafico_lineas as grafln
 import grafico_pizza as grafpz
+import streamlit.components.v1 as com
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
 st.set_page_config(layout='wide')
 st.title('Seguimiento Presupuestal 2025 :bar_chart: ')
@@ -11,6 +12,7 @@ df_ejecucion = pd.read_excel('https://raw.githubusercontent.com/Rich-13/seguimie
 tab_titles = [
     "EJECUCIÓN PRESUPUESTAL 2025",
     "CUADRO DE NECESIDADES 2025",
+    "GUÍA Y DOCUMENTACIÓN 2025"
 ]
 tabs = st.tabs(tab_titles)
 
@@ -30,7 +32,7 @@ nombres_tb = st.sidebar.selectbox('Tipo de Bien',lista_tb,format_func=lambda x: 
 nombres_ff = st.sidebar.selectbox('Fuente de Financiamiento',lista_ff,index=None,placeholder="Ingrese la Fuente de Financiamiento")
 
 with tabs[0]:
-    st.header('2. Ejecución Presupuestal')
+    st.header('Ejecución Presupuestal')
 
     #Filtrando los datos
     if nombres_cc:
@@ -194,7 +196,7 @@ with tabs[0]:
 
 with tabs[1]:
 
-    st.header('1. Cuadro de Necesidades')
+    st.header('Cuadro de Necesidades')
 
     #Crear unidades por mes
     for mes in range(1, 13):
@@ -535,3 +537,15 @@ with tabs[1]:
         fit_columns_on_grid_load=True,
     )
 
+with tabs[2]:
+
+    st.header('1. Guía de Ejecución Presupuestal')
+
+    canva_guia_ep="""
+    <div style="position: relative; width: 100%; height: 0; padding-top: 56.2500%; padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden; border-radius: 8px; will-change: transform;">
+    <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;" src="https://www.canva.com/design/DAGiZfYEPro/kqDPenFePEKAi50WK3AQpw/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
+    </iframe>
+    </div>
+    <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAGiZfYEPro&#x2F;kqDPenFePEKAi50WK3AQpw&#x2F;view?utm_content=DAGiZfYEPro&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">Blue Modern Travel Guide Presentation</a> de Richard Yancce Tineo
+    """
+    st.markdown(canva_guia_ep, unsafe_allow_html=True)
