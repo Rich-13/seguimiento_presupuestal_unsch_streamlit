@@ -24,7 +24,7 @@ lista_tb = sorted(list(df_ejecucion['TIPO_BIEN'].unique()))
 lista_ff = sorted(list(df_ejecucion['nombre_ff'].unique()))
 
 #Diccionario para B y S
-diccionario_tb = {'S': 'Servicio', 'B': 'Bien', 'V': 'Pasajes y Viáticos'}
+diccionario_tb = {'S': 'Servicio', 'B': 'Bien','P': 'Planilla', 'V': 'Pasajes y Viáticos'}
 
 #selectbox
 nombres_cc = st.sidebar.selectbox('Centro de Costo',lista_cc,index=None,placeholder="Ingrese el Centro de Costo")
