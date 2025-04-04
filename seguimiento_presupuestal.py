@@ -6,6 +6,18 @@ import grafico_pizza as grafpz
 import streamlit.components.v1 as com
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
 st.set_page_config(layout='wide')
+st.markdown(
+    """
+    <style>
+    .css-1jc7ptx, .e1ewe7hr3, .viewerBadge_container__1QSob,
+    .styles_viewerBadge__1yB5_, .viewerBadge_link__1S137,
+    .viewerBadge_text__1JaDK {
+        display: none;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 st.title('Seguimiento Presupuestal 2025 :bar_chart: ')
 df_seguimiento = pd.read_excel('https://raw.githubusercontent.com/Rich-13/seguimiento_presupuestal_unsch_streamlit/main/data/cn_mes_2025.xlsx')
 df_ejecucion = pd.read_excel('https://raw.githubusercontent.com/Rich-13/seguimiento_presupuestal_unsch_streamlit/main/data/ep_mes_2025.xlsx')
@@ -539,7 +551,7 @@ with tabs[1]:
 
 with tabs[2]:
     
-    st.header('1. Guía para Registro de seguimiento')
+    st.header('Guía para Registro de seguimiento')
 
     st.subheader("Ingreso al aplicativo", divider=True)
     st.link_button("IR AL APLICATIVO CEPLAN", "http://app.ceplan.gob.pe/POI2025/ingresar.aspx")
@@ -547,7 +559,7 @@ with tabs[2]:
     st.subheader("Video Tutoral", divider=True)
     guidde_guia_ep= st.video("https://storage.app.guidde.com/v0/b/guidde-production.appspot.com/o/uploads%2FJQs1ODfyRDNRy4bYXv5KOds2pEg1%2Fg7GEx5YzXjTJbtxLYQQKuc.mp4?alt=media&token=debb47a4-2480-46da-b610-0b56bf08361f")
 
-    st.subheader("Documento Guía", divider=True)
+    st.subheader("Material de Apoyo", divider=True)
     canva_guia_ep="""
     <div style="position: relative; width: 100%; height: 0; padding-top: 56.2500%; padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden; border-radius: 8px; will-change: transform;">
     <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;" src="https://www.canva.com/design/DAGiZfYEPro/kqDPenFePEKAi50WK3AQpw/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
