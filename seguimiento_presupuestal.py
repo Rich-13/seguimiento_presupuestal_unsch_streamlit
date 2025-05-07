@@ -36,7 +36,7 @@ lista_tb = sorted(list(df_ejecucion['TIPO_BIEN'].unique()))
 lista_ff = sorted(list(df_ejecucion['nombre_ff'].unique()))
 
 #Diccionario para B y S
-diccionario_tb = {'S': 'Servicio', 'B': 'Bien','P': 'Planilla', 'V': 'Pasajes y Viáticos'}
+diccionario_tb = {'S': 'Servicio', 'B': 'Bien','P': 'Planilla(2.2.)', 'V': 'Pasajes y Viáticos','C':'Caja Chica'}
 
 #selectbox
 nombres_cc = st.sidebar.selectbox('Centro de Costo',lista_cc,index=None,placeholder="Ingrese el Centro de Costo")
@@ -60,6 +60,8 @@ with tabs[0]:
     df_ejecucion_bien = df_ejecucion[df_ejecucion['TIPO_BIEN'] =='B']
     df_ejecucion_servicio = df_ejecucion[df_ejecucion['TIPO_BIEN'] =='S']
     df_ejecucion_viaticos = df_ejecucion[df_ejecucion['TIPO_BIEN'] =='V']
+    df_ejecucion_planillas = df_ejecucion[df_ejecucion['TIPO_BIEN'] =='P']
+    df_ejecucion_caja = df_ejecucion[df_ejecucion['TIPO_BIEN'] =='C']
 
     #Llamar Gráfico
     graf_lineas_ep = grafln.crear_grafico_ep(df_ejecucion)
@@ -68,13 +70,15 @@ with tabs[0]:
     col1, col2 = st.columns(2)
     with col1:
         st.metric('**Presupuesto Ejecutado:**', f"S/ {(df_ejecucion['monto_nacional'].sum()):,.2f}")
-        st.metric('**Pasajes y Viáicos:**', f"S/ {(df_ejecucion_viaticos['monto_nacional'].sum()):,.2f}")
+        st.metric('**Caja Chica:**', f"S/ {(df_ejecucion_caja['monto_nacional'].sum()):,.2f}")
+        st.metric('**Planilla y Pensiones (2.2.):**', f"S/ {(df_ejecucion_planillas['monto_nacional'].sum()):,.2f}")
         st.plotly_chart(graf_pizza_ep, use_container_width=True)
         
     with col2:
         
         st.metric('**Bien:**', f"S/ {(df_ejecucion_bien['monto_nacional'].sum()):,.2f}")
         st.metric('**Servicio:**', f"S/ {(df_ejecucion_servicio['monto_nacional'].sum()):,.2f}")
+        st.metric('**Pasajes y Viáicos:**', f"S/ {(df_ejecucion_viaticos['monto_nacional'].sum()):,.2f}")
         st.plotly_chart(graf_lineas_ep, use_container_width=True)
 
     month_order_es = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", 
