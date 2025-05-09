@@ -3,6 +3,7 @@ import numpy as np
 import streamlit as st
 import grafico_lineas as grafln
 import grafico_pizza as grafpz
+import grafico_barras as grafbrr
 import streamlit.components.v1 as com
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
 st.set_page_config(layout='wide')
@@ -66,6 +67,8 @@ with tabs[0]:
     #Llamar Gráfico
     graf_lineas_ep = grafln.crear_grafico_ep(df_ejecucion)
     graf_pizza_ep = grafpz.crear_grafico_ep(df_ejecucion)
+    graf_barras_ep_top = grafbrr.generar_grafico_top10(df_ejecucion)
+    graf_barras_ep_bootom = grafbrr.generar_grafico_boottom10(df_ejecucion)
     #Columnas
     col1, col2 = st.columns(2)
     with col1:
@@ -73,6 +76,7 @@ with tabs[0]:
         st.metric('**Caja Chica:**', f"S/ {(df_ejecucion_caja['monto_nacional'].sum()):,.2f}")
         st.metric('**Planilla y Pensiones (2.2.):**', f"S/ {(df_ejecucion_planillas['monto_nacional'].sum()):,.2f}")
         st.plotly_chart(graf_pizza_ep, use_container_width=True)
+        st.plotly_chart(graf_barras_ep_top, use_container_width=True)
         
     with col2:
         
@@ -80,6 +84,7 @@ with tabs[0]:
         st.metric('**Servicio:**', f"S/ {(df_ejecucion_servicio['monto_nacional'].sum()):,.2f}")
         st.metric('**Pasajes y Viáicos:**', f"S/ {(df_ejecucion_viaticos['monto_nacional'].sum()):,.2f}")
         st.plotly_chart(graf_lineas_ep, use_container_width=True)
+        st.plotly_chart(graf_barras_ep_bootom, use_container_width=True)
 
     month_order_es = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", 
                   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
@@ -560,7 +565,7 @@ with tabs[2]:
     st.subheader("Ingreso al aplicativo", divider=True)
     st.link_button("IR AL APLICATIVO CEPLAN", "http://app.ceplan.gob.pe/POI2025/ingresar.aspx")
     
-    st.subheader("Video Tutoral", divider=True)
+    st.subheader("Video Tutorial", divider=True)
     guidde_guia_ep= st.video("https://storage.app.guidde.com/v0/b/guidde-production.appspot.com/o/uploads%2FJQs1ODfyRDNRy4bYXv5KOds2pEg1%2Fg7GEx5YzXjTJbtxLYQQKuc.mp4?alt=media&token=debb47a4-2480-46da-b610-0b56bf08361f")
 
     st.subheader("Material de Apoyo", divider=True)
