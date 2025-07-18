@@ -22,6 +22,7 @@ st.markdown(
 st.title('Seguimiento Presupuestal 2025 :bar_chart: ')
 df_seguimiento = pd.read_excel('https://raw.githubusercontent.com/Rich-13/seguimiento_presupuestal_unsch_streamlit/main/data/cn_mes_2025.xlsx')
 df_ejecucion = pd.read_excel('https://raw.githubusercontent.com/Rich-13/seguimiento_presupuestal_unsch_streamlit/main/data/ep_mes_2025.xlsx')
+df_ejecucion['tipo_clasificador'] = df_ejecucion['clasificador'].str.split(' ').str[0]
 tab_titles = [
     "EJECUCIÓN PRESUPUESTAL 2025",
     "CUADRO DE NECESIDADES 2025",
@@ -35,6 +36,8 @@ st.sidebar.title('Filtros')
 lista_cc = sorted(list(df_seguimiento['NOMBRE_DEPEND'].unique()))
 lista_tb = sorted(list(df_ejecucion['TIPO_BIEN'].unique()))
 lista_ff = sorted(list(df_ejecucion['nombre_ff'].unique()))
+lista_clasificador = sorted(list(df_ejecucion['tipo_clasificador'].dropna().unique()))
+
 
 #Diccionario para B y S
 diccionario_tb = {'S': 'Servicio', 'B': 'Bien','P': 'Planilla(2.2.)', 'V': 'Pasajes y Viáticos','C':'Caja Chica'}
@@ -43,6 +46,7 @@ diccionario_tb = {'S': 'Servicio', 'B': 'Bien','P': 'Planilla(2.2.)', 'V': 'Pasa
 nombres_cc = st.sidebar.selectbox('Centro de Costo',lista_cc,index=None,placeholder="Ingrese el Centro de Costo")
 nombres_tb = st.sidebar.selectbox('Tipo de Bien',lista_tb,format_func=lambda x: diccionario_tb.get(x, x),index=None,placeholder="Ingrese el Bien")
 nombres_ff = st.sidebar.selectbox('Fuente de Financiamiento',lista_ff,index=None,placeholder="Ingrese la Fuente de Financiamiento")
+nombres_clasificador = st.sidebar.selectbox('Clasificador de Gasto',lista_clasificador,index=None,placeholder="Ingrese el Clasificador de Gasto")
 
 with tabs[0]:
     st.header('Ejecución Presupuestal')
@@ -56,6 +60,8 @@ with tabs[0]:
 
     if nombres_ff:
         df_ejecucion = df_ejecucion[df_ejecucion['nombre_ff']==nombres_ff]
+    if nombres_clasificador:
+        df_ejecucion = df_ejecucion[df_ejecucion['tipo_clasificador']==nombres_clasificador]
 
     #Ejecución por tipo
     df_ejecucion_bien = df_ejecucion[df_ejecucion['TIPO_BIEN'] =='B']
